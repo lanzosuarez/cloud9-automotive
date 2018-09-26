@@ -3,7 +3,16 @@ import ReactDOM from "react-dom";
 
 import App from "./App";
 import registerServiceWorker from "./registerServiceWorker";
+import { setUrl } from "./globa";
+import { VehicleProvider } from "./context/VehicleContext";
 
-ReactDOM.render(<App />, document.getElementById("root"));
+setUrl();
+
+ReactDOM.render(
+  <VehicleProvider>
+    <App />
+  </VehicleProvider>,
+  document.getElementById("root")
+);
 
 registerServiceWorker();

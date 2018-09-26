@@ -1,38 +1,37 @@
 import React, { Component } from "react";
 
 import { Row, Col, Table, Divider, Button } from "antd";
+import { VehicleConnect } from "../../../context/VehicleContext";
+import VehicleService from "../../../services/VehiclesService";
 
 const { Column } = Table;
 
-const data = [
-  {
-    key: "1",
-    firstName: "John",
-    lastName: "Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    tags: ["nice", "developer"]
-  },
-  {
-    key: "2",
-    firstName: "Jim",
-    lastName: "Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-    tags: ["loser"]
-  },
-  {
-    key: "3",
-    firstName: "Joe",
-    lastName: "Black",
-    age: 32,
-    address: "Sidney No. 1 Lake Park",
-    tags: ["cool", "teacher"]
-  }
-];
-
 class Cars extends Component {
+  state = { loading: false };
+
+  toggleLoad = () => this.setState({ loading: !this.state.loading });
+
+  componentDidMount() {
+    this.getCars();
+  }
+
+  getCars = async () => {
+    const { setVehicleState } = this.props.vehicleActions;
+    this.toggleLoad();
+    try {
+      let res = await VehicleService.getCars();
+      this.toggleLoad();
+      console.log(res);
+      setVehicleState(res.data);
+    } catch (error) {
+      console.error(error);
+      this.toggleLoad();
+    }
+  };
+
   render() {
+    const { cars } = this.props.vehicleState;
+
     return (
       <Row>
         <Col>
@@ -42,31 +41,44 @@ class Cars extends Component {
           </Row>
         </Col>
         <Col>
-          <Table scroll={{ x: 1500, y: 500 }} size="small" dataSource={data}>
+          <Table
+            loading={this.state.loading}
+            scroll={{ x: 1500, y: 500 }}
+            size="small"
+            dataSource={cars || []}
+          >
             <Column
               fixed="left"
               width={100}
               title="Brand Name"
-              dataIndex="age"
-              key="age"
+              dataIndex="brand_name"
+              key="brand_name"
             />
             <Column
               fixed="left"
               width={100}
               title="Carl Model"
-              dataIndex="address"
-              key="address"
+              dataIndex="car_model"
+              key="car_model"
             />
-            <Column title="Brand New" dataIndex="address" key="address" />
-            <Column title="Price" dataIndex="address" key="address" />
-            <Column title="Year Model" dataIndex="address" key="address" />
-            <Column title="Color" dataIndex="address" key="address" />
-            <Column title="Milage" dataIndex="address" key="address" />
-            <Column title="Vehicle Type" dataIndex="address" key="address" />
+            <Column title="Brand New" dataIndex="brand_new" key="brand_new" />
+            <Column title="Price" dataIndex="price" key="price" />
+            <Column
+              title="Year Model"
+              dataIndex="year_model"
+              key="year_model"
+            />
+            <Column title="Color" dataIndex="color" key="color" />
+            <Column title="Milage" dataIndex="milage" key="milage" />
+            <Column
+              title="Vehicle Type"
+              dataIndex="vehicle_type"
+              key="vehicle_type"
+            />
             <Column
               title="Wheel Configuration"
-              dataIndex="address"
-              key="address"
+              dataIndex="wheel_config"
+              key="wheel_config"
             />
             <Column
               fixed="right"
@@ -88,4 +100,4 @@ class Cars extends Component {
   }
 }
 
-export default Cars;
+export default VehicleConnect(["vehicleState", "vehicleActions"])(Cars);
